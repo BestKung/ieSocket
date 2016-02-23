@@ -245,7 +245,7 @@ public class ClientGui extends javax.swing.JFrame {
         while (true) {
             message = resived.readLine();
             if (message.contains("file&&")) {
-                String spt_file[] = message.split("&&");
+                String spt_file[] = message.split("@");
                 String fileName = spt_file[1];
                 File file = new File("F:\\" + fileName);
                 System.out.println(new ManageFile().reseivedFile(file, inputFile, Long.parseLong(spt_file[2])));

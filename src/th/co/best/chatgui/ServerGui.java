@@ -161,7 +161,7 @@ public class ServerGui extends javax.swing.JFrame {
                 printWriter = new PrintWriter(socket.getOutputStream(), true);
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 File file = new File(pathFile);
-                printWriter.println("file&&" + file.getName() + "&&" + file.length());
+                printWriter.println("file@" + file.getName() + "@" + file.length());
                 new socketchatie.ClientGui().sendFile(file, dataOutputStream);
             } catch (IOException ex) {
                 Logger.getLogger(socketchatie.ClientGui.class.getName()).log(Level.SEVERE, null, ex);
