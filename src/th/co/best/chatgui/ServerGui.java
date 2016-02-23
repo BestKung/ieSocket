@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -42,17 +43,26 @@ public class ServerGui extends javax.swing.JFrame {
     static DataInputStream inputFile = null;
     static StyledDocument doc = null;
     static SimpleAttributeSet style = null;
+    static int port;
+    static String pathDefault;
 
     /**
      * Creates new form ServerGui
      */
-    public ServerGui() {
+    public ServerGui(int port , String path) {
         initComponents();
         setTitle("Chat Server!!");
         doc = txtShow.getStyledDocument();
         style = new SimpleAttributeSet();
-
+        this.port = port;
+        this.pathDefault = path;
     }
+
+    private ServerGui() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -70,7 +80,7 @@ public class ServerGui extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         txtShow = new javax.swing.JTextPane();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         txtInput.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -98,11 +108,11 @@ public class ServerGui extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(txtInput, javax.swing.GroupLayout.PREFERRED_SIZE, 472, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -113,8 +123,8 @@ public class ServerGui extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 388, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -122,7 +132,7 @@ public class ServerGui extends javax.swing.JFrame {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnImage, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         setSize(new java.awt.Dimension(668, 507));
@@ -162,9 +172,13 @@ public class ServerGui extends javax.swing.JFrame {
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 File file = new File(pathFile);
                 printWriter.println("file@" + file.getName() + "@" + file.length());
-                new socketchatie.ClientGui().sendFile(file, dataOutputStream);
+                StyleConstants.setBackground(style, Color.decode("#fff176"));
+                StyleConstants.setBold(style, true);
+                doc.insertString(doc.getLength(), "\n" + new socketchatie.ClientGui().sendFile(file, dataOutputStream), style);
             } catch (IOException ex) {
                 Logger.getLogger(socketchatie.ClientGui.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadLocationException ex) {
+                Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_btnImageActionPerformed
@@ -226,8 +240,9 @@ public class ServerGui extends javax.swing.JFrame {
                 new ServerGui().setVisible(true);
             }
         });
-
-        serverSocket = new ServerSocket(1111);
+        port = 1111;
+        pathDefault = "F:\\";
+        serverSocket = new ServerSocket(port);
         socket = serverSocket.accept();
         resived = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         send = new DataOutputStream(socket.getOutputStream());
@@ -239,16 +254,16 @@ public class ServerGui extends javax.swing.JFrame {
         while (true) {
             message = resived.readLine();
             System.out.println(message);
-            if (message.contains("file&&")) {
-                String spt_file[] = message.split("&&");
+            if (message.contains("file@")) {
+                String spt_file[] = message.split("@");
                 for (String s : spt_file) {
                     System.out.println(s);
                 }
                 String fileName = spt_file[1];
-                File file = new File("F:\\" + fileName);
+                File file = new File(pathDefault + fileName);
                 System.out.println(new ManageFile().reseivedFile(file, inputFile, Long.parseLong(spt_file[2])));
                 if ((fileName.substring(fileName.length() - 3, fileName.length()).equalsIgnoreCase("jpg")) || (fileName.substring(fileName.length() - 3, fileName.length()).equalsIgnoreCase("png"))) {
-                    FromDialogShowImage dialogShowImage = new FromDialogShowImage("F:\\" + fileName);
+                    FromDialogShowImage dialogShowImage = new FromDialogShowImage(pathDefault + fileName);
                     dialogShowImage.setVisible(true);
                     StyleConstants.setBackground(style, Color.decode("#80deea"));
                     StyleConstants.setBold(style, true);

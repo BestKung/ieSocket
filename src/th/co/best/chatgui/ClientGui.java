@@ -30,6 +30,7 @@ import th.co.best.chatgui.ManageFile;
 import static th.co.best.chatgui.ServerGui.message;
 import static th.co.best.chatgui.ServerGui.resived;
 import static th.co.best.chatgui.ServerGui.send;
+import static th.co.best.chatgui.ServerGui.style;
 
 /**
  *
@@ -45,16 +46,26 @@ public class ClientGui extends javax.swing.JFrame {
     static String tmpMessage = "";
     static StyledDocument doc = null;
     static SimpleAttributeSet style = null;
+    static int port;
+    static String ip;
+    static String path;
 
     /**
      * Creates new form ClientGui
      */
-    public ClientGui() {
+    public ClientGui(int port, String ip, String path) {
         initComponents();
         setTitle("Chat Client!!");
         doc = txtShow.getStyledDocument();
         style = new SimpleAttributeSet();
+        this.port = port;
+        this.ip = ip;
+        this.path = path;
 
+    }
+
+    private ClientGui() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     /**
@@ -171,9 +182,13 @@ public class ClientGui extends javax.swing.JFrame {
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 File file = new File(pathFile);
                 printWriter.println("file&&" + file.getName() + "&&" + file.length());
-                new socketchatie.ClientGui().sendFile(file, dataOutputStream);
+                StyleConstants.setBackground(style, Color.decode("#fff176"));
+                StyleConstants.setBold(style, true);
+                doc.insertString(doc.getLength(), "\n" + new socketchatie.ClientGui().sendFile(file, dataOutputStream), style);
             } catch (IOException ex) {
                 Logger.getLogger(socketchatie.ClientGui.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadLocationException ex) {
+                Logger.getLogger(ClientGui.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_btnImageActionPerformed
@@ -239,18 +254,18 @@ public class ClientGui extends javax.swing.JFrame {
                 new ClientGui().setVisible(true);
             }
         });
-        socket = new Socket("192.168.1.130", 1111);
+        socket = new Socket(ip, port);
         resived = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         inputFile = new DataInputStream(socket.getInputStream());
         while (true) {
             message = resived.readLine();
-            if (message.contains("file&&")) {
+            if (message.contains("file@")) {
                 String spt_file[] = message.split("@");
                 String fileName = spt_file[1];
-                File file = new File("F:\\" + fileName);
+                File file = new File(path + fileName);
                 System.out.println(new ManageFile().reseivedFile(file, inputFile, Long.parseLong(spt_file[2])));
                 if ((fileName.substring(fileName.length() - 3, fileName.length()).equalsIgnoreCase("jpg")) || (fileName.substring(fileName.length() - 3, fileName.length()).equalsIgnoreCase("png"))) {
-                    FromDialogShowImage dialogShowImage = new FromDialogShowImage(fileName);
+                    FromDialogShowImage dialogShowImage = new FromDialogShowImage(path + fileName);
                     dialogShowImage.setVisible(true);
                     StyleConstants.setBackground(style, Color.decode("#80deea"));
                     StyleConstants.setBold(style, true);
