@@ -260,14 +260,14 @@ public class ClientGui extends javax.swing.JFrame {
                 new ClientGui().setVisible(true);
             }
         });
-        socket = new Socket("localhost", 1111);
+        socket = new Socket("192.168.1.130", 1111);
         resived = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         inputFile = new DataInputStream(socket.getInputStream());
         while (true) {
             message = resived.readLine();
             if (message.contains("file&&")) {
-                String fileInformation = resived.readLine();
-                String spt_file[] = fileInformation.split("&&");
+//                String fileInformation = resived.readLine();
+                String spt_file[] = message.split("&&");
                 String fileName = spt_file[1];
                 File file = new File("F:\\" + fileName);
                 System.out.println(new ManageFile().reseivedFile(file, inputFile, Long.parseLong(spt_file[2])));
