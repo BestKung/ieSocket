@@ -45,7 +45,6 @@ public class ClientGui extends javax.swing.JFrame {
     static String tmpMessage = "";
     static StyledDocument doc = null;
     static SimpleAttributeSet style = null;
-    
 
     /**
      * Creates new form ClientGui
@@ -139,11 +138,11 @@ public class ClientGui extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
-      PrintWriter printWriter = null;
+        PrintWriter printWriter = null;
         send = null;
         try {
             send = new DataOutputStream(socket.getOutputStream());
-              printWriter = new PrintWriter(socket.getOutputStream() , true);
+            printWriter = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException ex) {
             Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -160,28 +159,43 @@ public class ClientGui extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSendActionPerformed
 
     private void btnImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImageActionPerformed
-         PrintWriter printWriter = null; 
+//        PrintWriter printWriter = null;
+//        int value = jFileChooser1.showOpenDialog(null);
+//        File file = jFileChooser1.getSelectedFile();
+//        String path = file.getAbsolutePath();
+//        if (jFileChooser1.APPROVE_OPTION == value) {
+//            try {
+//                printWriter = new PrintWriter(socket.getOutputStream(), true);
+//                send = new DataOutputStream(socket.getOutputStream());
+//                File fileSend = new File(path);
+//                printWriter.println("file&&"+fileSend.getName() + "&&" + fileSend.length());
+//                StyleConstants.setBackground(style, Color.decode("#fff176"));
+//                StyleConstants.setBold(style, true);
+//
+//                doc.insertString(doc.getLength(), "\n" + new ManageFile().sendFile(fileSend, send), style);
+//            } catch (BadLocationException ex) {
+//                Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (IOException ex) {
+//                Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        } else {
+//            System.out.println("No");
+//        }
+        PrintWriter printWriter;
         int value = jFileChooser1.showOpenDialog(null);
-        File file = jFileChooser1.getSelectedFile();
-        String path = file.getAbsolutePath();
+        File getFile = jFileChooser1.getSelectedFile();
+        String pathFile = getFile.getAbsolutePath();
+        DataOutputStream dataOutputStream;
         if (jFileChooser1.APPROVE_OPTION == value) {
             try {
-                printWriter = new PrintWriter(socket.getOutputStream() , true);
-            send = new DataOutputStream(socket.getOutputStream());
-            printWriter.println("file");
-            File fileSend = new File(path);
-            printWriter.println(fileSend.getName() + "&&" + fileSend.length());
-            StyleConstants.setBackground(style, Color.decode("#fff176"));
-            StyleConstants.setBold(style, true);
-            
-                doc.insertString(doc.getLength(), "\n" + new ManageFile().sendFile(fileSend, send), style);
-            } catch (BadLocationException ex) {
-                Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
+                printWriter = new PrintWriter(socket.getOutputStream(), true);
+                dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                File file = new File(pathFile);
+                printWriter.println("file&&" + file.getName() + "&&" + file.length());
+                new socketchatie.ClientGui().sendFile(file, dataOutputStream);
             } catch (IOException ex) {
-                Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(socketchatie.ClientGui.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } else {
-            System.out.println("No");
         }
     }//GEN-LAST:event_btnImageActionPerformed
 
@@ -192,10 +206,10 @@ public class ClientGui extends javax.swing.JFrame {
 
     private void txtSendKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSendKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-             PrintWriter printWriter = null;
+            PrintWriter printWriter = null;
             send = null;
             try {
-                printWriter= new PrintWriter(socket.getOutputStream(), true);
+                printWriter = new PrintWriter(socket.getOutputStream(), true);
                 send = new DataOutputStream(socket.getOutputStream());
             } catch (IOException ex) {
                 Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
@@ -246,20 +260,17 @@ public class ClientGui extends javax.swing.JFrame {
                 new ClientGui().setVisible(true);
             }
         });
-        socket = new Socket("192.168.43.10", 1111);
+        socket = new Socket("localhost", 1111);
         resived = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         inputFile = new DataInputStream(socket.getInputStream());
         while (true) {
             message = resived.readLine();
-            if (message.equals("file")) {
+            if (message.contains("file&&")) {
                 String fileInformation = resived.readLine();
-                System.out.println(fileInformation);
                 String spt_file[] = fileInformation.split("&&");
-                String fileName = spt_file[0];
-                System.out.println(fileName);
+                String fileName = spt_file[1];
                 File file = new File("F:\\" + fileName);
-
-                System.out.println(new ManageFile().reseivedFile(file, inputFile, Long.parseLong(spt_file[1])));
+                System.out.println(new ManageFile().reseivedFile(file, inputFile, Long.parseLong(spt_file[2])));
                 if ((fileName.substring(fileName.length() - 3, fileName.length()).equalsIgnoreCase("jpg")) || (fileName.substring(fileName.length() - 3, fileName.length()).equalsIgnoreCase("png"))) {
                     FromDialogShowImage dialogShowImage = new FromDialogShowImage(fileName);
                     dialogShowImage.setVisible(true);
@@ -271,12 +282,13 @@ public class ClientGui extends javax.swing.JFrame {
                     StyleConstants.setBold(style, true);
                     doc.insertString(doc.getLength(), "\n Server : ได้รับไฟล์ ", style);
                 }
-                continue;
+            } else {
+                message = "Server : " + message;
+                StyleConstants.setBackground(style, Color.decode("#80deea"));
+                StyleConstants.setBold(style, true);
+                doc.insertString(doc.getLength(), "\n Server : " + message, style);
             }
-            message = "Server : " + message;
-            StyleConstants.setBackground(style, Color.decode("#80deea"));
-            StyleConstants.setBold(style, true);
-            doc.insertString(doc.getLength(), "\n Server : " + message, style);
+
         }
     }
 

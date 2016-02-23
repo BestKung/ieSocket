@@ -25,6 +25,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import static th.co.best.chatgui.ClientGui.socket;
 import th.co.best.chatgui.ManageFile;
 
 /**
@@ -150,28 +151,43 @@ public class ServerGui extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSendActionPerformed
 
     private void btnImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImageActionPerformed
-        PrintWriter printWriter = null;
+//        PrintWriter printWriter = null;
+//        int value = jFileChooser1.showOpenDialog(null);
+//        File file = jFileChooser1.getSelectedFile();
+//        String path = file.getAbsolutePath();
+//        if (jFileChooser1.APPROVE_OPTION == value) {
+//            try {
+//                printWriter = new PrintWriter(socket.getOutputStream(), true);
+//                send = new DataOutputStream(socket.getOutputStream());
+//                File fileSend = new File(path);
+//                printWriter.println("file&&"+fileSend.getName() + "&&" + fileSend.length());
+//                StyleConstants.setBackground(style, Color.decode("#fff176"));
+//                StyleConstants.setBold(style, true);
+//
+//                doc.insertString(doc.getLength(), "\n" + new ManageFile().sendFile(fileSend, send), style);
+//            } catch (BadLocationException ex) {
+//                Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (IOException ex) {
+//                Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        } else {
+//            System.out.println("No");
+//        }
+        PrintWriter printWriter;
         int value = jFileChooser1.showOpenDialog(null);
-        File file = jFileChooser1.getSelectedFile();
-        String path = file.getAbsolutePath();
+        File getFile = jFileChooser1.getSelectedFile();
+        String pathFile = getFile.getAbsolutePath();
+        DataOutputStream dataOutputStream;
         if (jFileChooser1.APPROVE_OPTION == value) {
             try {
                 printWriter = new PrintWriter(socket.getOutputStream(), true);
-                send = new DataOutputStream(socket.getOutputStream());
-                printWriter.println("file");
-                File fileSend = new File(path);
-                printWriter.println(fileSend.getName() + "&&" + fileSend.length());
-                StyleConstants.setBackground(style, Color.decode("#fff176"));
-                StyleConstants.setBold(style, true);
-
-                doc.insertString(doc.getLength(), "\n" + new ManageFile().sendFile(fileSend, send), style);
-            } catch (BadLocationException ex) {
-                Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
+                dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                File file = new File(pathFile);
+                printWriter.println("file&&" + file.getName() + "&&" + file.length());
+                new socketchatie.ClientGui().sendFile(file, dataOutputStream);
             } catch (IOException ex) {
-                Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(socketchatie.ClientGui.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } else {
-            System.out.println("No");
         }
     }//GEN-LAST:event_btnImageActionPerformed
 
@@ -245,12 +261,12 @@ public class ServerGui extends javax.swing.JFrame {
         inputFile = new DataInputStream(socket.getInputStream());
         while (true) {
             message = resived.readLine();
-            if (message.equals("file")) {
+            if (message.contains("file&&")) {
                 String fileInformation = resived.readLine();
                 String spt_file[] = fileInformation.split("&&");
-                String fileName = spt_file[0];
+                String fileName = spt_file[1];
                 File file = new File("F:\\" + fileName);
-                System.out.println(new ManageFile().reseivedFile(file, inputFile, Long.parseLong(spt_file[1])));
+                System.out.println(new ManageFile().reseivedFile(file, inputFile, Long.parseLong(spt_file[2])));
                 if ((fileName.substring(fileName.length() - 3, fileName.length()).equalsIgnoreCase("jpg")) || (fileName.substring(fileName.length() - 3, fileName.length()).equalsIgnoreCase("png"))) {
                     FromDialogShowImage dialogShowImage = new FromDialogShowImage(fileName);
                     dialogShowImage.setVisible(true);
