@@ -159,28 +159,7 @@ public class ClientGui extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSendActionPerformed
 
     private void btnImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImageActionPerformed
-//        PrintWriter printWriter = null;
-//        int value = jFileChooser1.showOpenDialog(null);
-//        File file = jFileChooser1.getSelectedFile();
-//        String path = file.getAbsolutePath();
-//        if (jFileChooser1.APPROVE_OPTION == value) {
-//            try {
-//                printWriter = new PrintWriter(socket.getOutputStream(), true);
-//                send = new DataOutputStream(socket.getOutputStream());
-//                File fileSend = new File(path);
-//                printWriter.println("file&&"+fileSend.getName() + "&&" + fileSend.length());
-//                StyleConstants.setBackground(style, Color.decode("#fff176"));
-//                StyleConstants.setBold(style, true);
-//
-//                doc.insertString(doc.getLength(), "\n" + new ManageFile().sendFile(fileSend, send), style);
-//            } catch (BadLocationException ex) {
-//                Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
-//            } catch (IOException ex) {
-//                Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//        } else {
-//            System.out.println("No");
-//        }
+
         PrintWriter printWriter;
         int value = jFileChooser1.showOpenDialog(null);
         File getFile = jFileChooser1.getSelectedFile();
@@ -266,7 +245,6 @@ public class ClientGui extends javax.swing.JFrame {
         while (true) {
             message = resived.readLine();
             if (message.contains("file&&")) {
-//                String fileInformation = resived.readLine();
                 String spt_file[] = message.split("&&");
                 String fileName = spt_file[1];
                 File file = new File("F:\\" + fileName);
